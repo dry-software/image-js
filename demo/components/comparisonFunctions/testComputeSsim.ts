@@ -1,5 +1,4 @@
-import { Image } from '../../../src/index.js';
-import { computeSsim } from '../../../src/ssim/index.js';
+import { Image, computeSsim } from '../../image_js.ts';
 
 /**
  * Compute the structural similarity of the input image and the image blurred.
