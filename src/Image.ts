@@ -78,7 +78,7 @@ import {
   transform,
   transformRotate,
 } from './geometry/index.js';
-import type { ImageMetadata } from './load/load.types.js';
+import type { ImageMetadata, Resolution } from './load/load.types.js';
 import type {
   BottomHatOptions,
   CannyEdgeOptions,
@@ -173,6 +173,10 @@ export interface ImageOptions {
    * @default `{row: 0, column: 0}`
    */
   origin?: Point;
+  /**
+   * Original resolution decoded from the image.
+   */
+  resolution?: Resolution;
 
   meta?: ImageMetadata;
 }
@@ -235,8 +239,12 @@ export class Image {
    */
   public readonly origin: Point;
 
-  public readonly meta?: ImageMetadata;
+  /**
+   * Original image resolution.
+   */
+  public readonly originalResolution: Resolution | undefined;
 
+  public readonly meta?: ImageMetadata;
   /**
    * Typed array holding the image data.
    */
@@ -259,6 +267,7 @@ export class Image {
       colorModel = 'RGB',
       origin = { row: 0, column: 0 },
       meta,
+      resolution,
     } = options;
 
     if (width < 1 || !Number.isInteger(width)) {
@@ -280,7 +289,7 @@ export class Image {
     this.colorModel = colorModel;
     this.origin = origin;
     this.meta = meta;
-
+    this.originalResolution = resolution;
     const colorModelDef = colorModels[colorModel];
     this.components = colorModelDef.components;
     this.alpha = colorModelDef.alpha;
@@ -311,7 +320,38 @@ export class Image {
       this.data = data;
     }
   }
-
+  /**
+   * Returns normalized resolution in pixels per centimeter. If resolution unit is unknown, return null.
+   * @returns Object with x and y resolutions in pixel/cm.
+   */
+  get normalizedResolution() {
+    if (!this.originalResolution) {
+      return undefined;
+    }
+    const centimetersPerInch = 2.54;
+    const centimetersPerMeter = 100;
+    switch (this.originalResolution.unit) {
+      case 'inch':
+        return {
+          x: this.originalResolution.x / centimetersPerInch,
+          y: this.originalResolution.y / centimetersPerInch,
+        };
+      case 'centimeter':
+        return {
+          x: this.originalResolution.x,
+          y: this.originalResolution.y,
+        };
+      case 'meter':
+        return {
+          x: this.originalResolution.x / centimetersPerMeter,
+          y: this.originalResolution.y / centimetersPerMeter,
+        };
+      case 'unknown':
+        return null;
+      default:
+        throw new Error('Unknown resolution unit.');
+    }
+  }
   /**
    * Create a new Image based on the properties of an existing one.
    * @param other - Reference image.

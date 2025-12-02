@@ -5,3 +5,11 @@ export interface ImageMetadata {
   };
   exif: Record<string, unknown>;
 }
+
+export interface Resolution {
+  x: number;
+  y: number;
+  unit: ResolutionUnit;
+}
+
+export type ResolutionUnit = 'inch' | 'centimeter' | 'meter' | 'unknown';
