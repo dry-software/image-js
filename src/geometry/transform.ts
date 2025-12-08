@@ -2,10 +2,12 @@ import { Matrix, inverse } from 'ml-matrix';
 
 import { Image } from '../Image.js';
 import { getClamp } from '../utils/clamp.js';
+import { getDefaultColor } from '../utils/getDefaultColor.ts';
 import type { BorderType } from '../utils/interpolateBorder.js';
 import { getBorderInterpolation } from '../utils/interpolateBorder.js';
 import type { InterpolationType } from '../utils/interpolatePixel.js';
 import { getInterpolationFunction } from '../utils/interpolatePixel.js';
+import { validateColor } from '../utils/validators/validators.ts';
 
 export interface TransformOptions {
   /**
@@ -31,7 +33,7 @@ export interface TransformOptions {
    * Value of the border if BorderType is 'constant'.
    *  @default `0`
    */
-  borderValue?: number;
+  borderValue?: number | number[];
   /**
    * Whether the transform matrix should be inverted.
    */
@@ -56,12 +58,16 @@ export function transform(
   options: TransformOptions = {},
 ): Image {
   const {
+    borderValue = getDefaultColor(image),
     borderType = 'constant',
-    borderValue = 0,
     interpolationType = 'bilinear',
     fullImage,
   } = options;
   let { width = image.width, height = image.height } = options;
+
+  if (Array.isArray(borderValue)) {
+    validateColor(borderValue, image);
+  }
 
   if (!isValidMatrix(transformMatrix)) {
     throw new TypeError(

@@ -6,6 +6,7 @@ import {
 import { Image } from '../Image.js';
 import { extendBorders } from '../operations/extendBorders.js';
 import { getClamp } from '../utils/clamp.js';
+import { getDefaultColor } from '../utils/getDefaultColor.ts';
 import { getIndex } from '../utils/getIndex.js';
 import { getOutputImage } from '../utils/getOutputImage.js';
 import type { BorderType } from '../utils/interpolateBorder.js';
@@ -15,6 +16,7 @@ import type {
   BorderInterpolationFunction,
   ClampFunction,
 } from '../utils/utils.types.js';
+import { validateColor } from '../utils/validators/validators.ts';
 
 export interface ConvolutionOptions {
   /**
@@ -26,7 +28,7 @@ export interface ConvolutionOptions {
    * Value of the border if BorderType is 'constant'.
    * @default `0`
    */
-  borderValue?: number;
+  borderValue?: number | number[];
   /**
    * Whether the kernel should be normalized.
    * @default `false`
@@ -83,7 +85,11 @@ export function rawDirectConvolution(
   kernel: number[][],
   options: ConvolutionOptions = {},
 ): Float64Array {
-  const { borderType = 'reflect101', borderValue = 0 } = options;
+  const { borderType = 'reflect101', borderValue = getDefaultColor(image) } =
+    options;
+  if (Array.isArray(borderValue)) {
+    validateColor(borderValue, image);
+  }
   const interpolateBorder = getBorderInterpolation(borderType, borderValue);
 
   const result = new Float64Array(image.size * image.channels);

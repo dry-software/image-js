@@ -1,6 +1,7 @@
 import { xMedian } from 'ml-spectra-processing';
 
 import { Image } from '../Image.js';
+import { getDefaultColor } from '../utils/getDefaultColor.ts';
 import type { BorderType } from '../utils/interpolateBorder.js';
 import { getBorderInterpolation } from '../utils/interpolateBorder.js';
 import checkProcessable from '../utils/validators/checkProcessable.js';
@@ -14,7 +15,7 @@ export interface MedianFilterOptions {
   /**
    * Value of border.
    */
-  borderValue?: number;
+  borderValue?: number | number[];
   /**
    * The radius of the cell to extract median value from. Must be odd.
    *  @default `1`
@@ -28,7 +29,11 @@ export interface MedianFilterOptions {
  * @returns Image after median filter.
  */
 export function medianFilter(image: Image, options: MedianFilterOptions) {
-  const { cellSize = 3, borderType = 'reflect101', borderValue } = options;
+  const {
+    cellSize = 3,
+    borderType = 'reflect101',
+    borderValue = getDefaultColor(image),
+  } = options;
 
   checkProcessable(image, {
     bitDepth: [8, 16],
@@ -46,10 +51,7 @@ export function medianFilter(image: Image, options: MedianFilterOptions) {
     );
   }
 
-  const interpolateBorder = getBorderInterpolation(
-    borderType,
-    borderValue as number,
-  );
+  const interpolateBorder = getBorderInterpolation(borderType, borderValue);
 
   const newImage = Image.createFrom(image);
   const size = cellSize ** 2;

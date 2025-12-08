@@ -88,6 +88,10 @@ export type TestImagePath =
   | 'opencv/testAffineTransform.png'
   | 'opencv/testAntiClockwiseRot90.png'
   | 'opencv/testBlur.png'
+  | 'opencv/test_border_value_blue.png'
+  | 'opencv/test_border_value_red.png'
+  | 'opencv/test_border_value_white.png'
+  | 'opencv/test_border_value_yellow.png'
   | 'opencv/testClockwiseRot90.png'
   | 'opencv/testConvolution.png'
   | 'opencv/testGaussianBlur.png'
@@ -117,6 +121,7 @@ export type TestImagePath =
   | 'ssim/ssim-saltPepper.png'
   | 'various/alphabet.jpg'
   | 'various/grayscale_by_zimmyrose.png'
+  | 'various/magicHatImageRotated.png'
   | 'various/screws.png'
   | 'various/sudoku.jpg'
   | 'various/without-metadata.jpg';
