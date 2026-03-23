@@ -7,15 +7,12 @@ describe('getCanvasContext', () => {
     const originalCreateRequire = Module.createRequire;
     vi.spyOn(Module, 'createRequire').mockImplementation((url) => {
       const realRequire = originalCreateRequire(url);
-      return Object.assign(
-        (id: string) => {
-          if (id === 'skia-canvas') {
-            throw new Error("Cannot find module 'skia-canvas'");
-          }
-          return realRequire(id);
-        },
-        realRequire,
-      ) as NodeJS.Require;
+      return Object.assign((id: string) => {
+        if (id === 'skia-canvas') {
+          throw new Error("Cannot find module 'skia-canvas'");
+        }
+        return realRequire(id);
+      }, realRequire) as NodeJS.Require;
     });
 
     // Reset modules to get a fresh cross_platform with no cached CanvasCtorNode
